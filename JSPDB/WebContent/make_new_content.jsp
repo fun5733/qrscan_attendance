@@ -110,7 +110,7 @@ function validateForm() {
 <body>
 <div class="center">
 <% 
-	String cname="", chost="", ctype="", cloginid="", cdatestart="", cdateend="", dates = "";;
+	String cname="", chost="", ctype="", cloginid="", cdatestart="", cdateend="", dates = "", ctimestart="", ctimeend="";
 	int cid = 0;
 	cid = Integer.parseInt(request.getParameter("txtCID"));
 	cname = request.getParameter("txtCNAME");
@@ -119,14 +119,15 @@ function validateForm() {
 	cloginid = request.getParameter("txtCLOGINID");
 	cdatestart = request.getParameter("txtCDATE_START");
 	cdateend = request.getParameter("txtCDATE_END");
-	
+	ctimestart = request.getParameter("txtCTIME_START");
+	ctimeend = request.getParameter("txtCTIME_END");
 	Connection con = null;
 	PreparedStatement stmt = null;
 	try {
 		Class.forName("org.sqlite.JDBC");
 		con = DriverManager.getConnection("jdbc:sqlite:../../Users/tmpl/workspace/JSPDB/WebContent/test.db");
 
-		String sql = "insert into content_list values(?,?,?,?,?,?,?)";
+		String sql = "insert into content_list values(?,?,?,?,?,?,?,?,?)";
 		stmt = con.prepareStatement(sql);
 		stmt.setString(1, cname);
 		stmt.setInt(2, cid);
@@ -135,6 +136,8 @@ function validateForm() {
 		stmt.setString(5, chost);
 		stmt.setString(6, ctype);
 		stmt.setString(7, cloginid);
+		stmt.setString(8, ctimestart);
+		stmt.setString(9, ctimeend);
 		stmt.executeUpdate();
 		
 		// 자유 참가일 경우
@@ -220,9 +223,9 @@ function validateForm() {
 	<p id="img_out"><img src="<%=codePaths[0]%>"></p>
 <%
 	}
-	// 발생 경우
-	//	 뒤로가기를 눌러 new_content.jsp로 돌아간 뒤 바로 다시 make_new_content.jsp로 오는 경우(content_id가 같음)
-	//	-> content_list.jsp로 돌아가는 버튼을 표시해 돌아갈 수 있도록 함
+	// 에러 발생 경우
+	//	- 뒤로가기를 눌러 new_content.jsp로 돌아간 뒤 바로 다시 make_new_content.jsp로 오는 경우(content_id가 같음)
+	//	 -> content_list.jsp로 돌아가는 버튼을 표시해 돌아갈 수 있도록 함
 	catch(SQLException se) {
 		System.out.println("SQL Exception: " + se.getMessage());
 		out.println("새로운 일정을 추가하려면 일정 리스트 페이지로 돌아가 일정 추가 버튼을 눌러주세요.");

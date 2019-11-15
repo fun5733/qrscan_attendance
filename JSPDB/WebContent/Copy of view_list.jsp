@@ -32,23 +32,14 @@ function change() {
 			intro.style = "display:visible";
 			list.style = "display:none";
 			tb.rows[i].style = "display:visible";
-			document.getElementById("percent").style = "display:visible";
-			document.getElementById("t_date").style = "display:none";
-			document.getElementById("t_attend").style = "display:none";
 		}
 		else if(temp != selectedHTML) {
-			document.getElementById("t_date").style = "display:visible";
-			document.getElementById("t_attend").style = "display:visible";
-			document.getElementById("percent").style = "display:none";
 			list.style = "display:visible";
 			intro.style = "display:none";
 			tb.rows[i].style = "display:none";
 			count--;
 		}
 		else {
-			document.getElementById("t_date").style = "display:visible";
-			document.getElementById("t_attend").style = "display:visible";
-			document.getElementById("percent").style = "display:none";
 			list.style = "display:visible";
 			intro.style = "display:none";
 			tb.rows[i].style = "display:visible";
@@ -127,9 +118,7 @@ function validateForm() {
 <body>
 <%
 	String content_id = request.getParameter("content_id");
-	String date="", content_name="", cdatestart="", cdateend="", cloginid="", ctype="", i="";
-	String index = request.getParameter("index");
-	System.out.println("index = " + index);
+	String date="", content_name="", cdatestart="", cdateend="", cloginid="", ctype="";
 	String temp="", all="";
 	Connection con = null;
 	PreparedStatement stmt = null;
@@ -195,7 +184,6 @@ function validateForm() {
 	<input type="hidden" name="cdateend" value="<%=cdateend %>">
 	<input type="hidden" name="cloginid" value="<%=cloginid %>">
 	<input type="hidden" name="cid" value="<%=content_id %>">
-	<input type="hidden" name="index" value="<%=index %>">
 	<input type="submit" id="addMember" value="등록">
 </form>
 </div>
@@ -204,9 +192,8 @@ function validateForm() {
 	<tr>
 		<th>사번</th>
 		<th>이름</th>
-		<th id="t_date" style="display:none">날짜</th>
-		<th id="t_attend" style="display:none">출석</th>
-		<th id="percent">출석일/전체일</th>
+		<th>날짜</th>
+		<th>출석</th>
 	</tr>
 
 	<tbody id="list" style="display:none">
@@ -238,21 +225,22 @@ function validateForm() {
 			if(rs_count.next()) {
 				temp_count = rs_count.getInt(1);
 			}
-			temp = temp_count+"";
+			temp = temp_count+"번";
 			PreparedStatement stmt_all = null;
 			stmt_all = con.prepareStatement(sql_all);
 			ResultSet rs_all = stmt_all.executeQuery();
 			if(rs_all.next()) {
 				all_count = rs_all.getInt(1);
 			}
-			all = all_count+"";
+			all = all_count+"일 중";
 %>
 	</tbody>
 	<tbody id="intro" style="display:visible">
 	<tr>
 		<td><%=rs_view.getString("MEMBER_ID") %></td> 
 		<td><%=rs_view.getString("MEMBER_NAME") %></td>
-		<td><%=temp%> / <%=all%></td>
+		<td><%=all%></td>
+		<td><%=temp%></td>
 	</tr>
 <%
 		}

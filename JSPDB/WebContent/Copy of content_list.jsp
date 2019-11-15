@@ -20,28 +20,17 @@
 </style>
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script type="text/javascript">
-function getParameterByName(name) {
-	name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.search);
-    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-}
-var paramIndex = getParameterByName('index');
-$(document).ready(function() {
-	$("#" + paramIndex).get(0).click();
-});
 // ajax를 이용해 명단 보기가 클릭되면 view_list.jsp에서 갱신된 테이블 내용을 받아 화면에 표시
-function setCID(id, i) {
-	callAjax(id, i);
+function setCID(id) {
+	callAjax(id);
 }
-function callAjax(value, i){	
+function callAjax(value){	
 	$.ajax({
 		type: "post",
 		async: false,
 		url : "./view_list.jsp",
 		data: {
 			content_id : value,
-			index : i,
 		},
 		success: whenSuccess,
 		error: whenError
@@ -76,7 +65,10 @@ function change_c(){
 	for(var i=1; i<cb.rows.length; i++) {
 		
 		var temp = cb.rows[i].cells[1].innerHTML.substring(5, 7);
-		if(temp == selectedHTML) {
+		if(selectedHTML == "전체") {
+			cb.rows[i].style = "display:visible";
+		}
+		else if(temp == selectedHTML) {
 			cb.rows[i].style = "display:visible";
 		}
 		else {
@@ -92,8 +84,6 @@ function change_c(){
 	PreparedStatement stmt = null;
 	String loginID = "";
 	loginID = request.getParameter("loginID");
-	String index = "";
-	index = request.getParameter("index");
 %>
 <div class="center">
 <div class="select">
@@ -149,7 +139,6 @@ function change_c(){
 		ResultSet rs = stmt.executeQuery();
 		String cid="";
 		// 반복문을 돌면서 일정 리스트 출력
-		int i = 0;
 		while(rs.next()) {
 			cid = rs.getString("CONTENT_ID");
 %>
@@ -159,7 +148,7 @@ function change_c(){
 			<td><%=rs.getString("CONTENT_DATE_END") %></td>
 			<td><%=rs.getString("CONTENT_TIME_START") %> ~ <%=rs.getString("CONTENT_TIME_END") %></td>
 			<td><%=rs.getString("CONTENT_HOST") %></td>
-			<td><a href="javascript:setCID(<%=cid%>, <%=i%>)" id="<%=i%>">보기</a></td>	<!-- 클릭하면 ajax로 값을 넘겨 화면을 부분적(div id=ajaxReturn)으로 갱신되게 함 -->
+			<td><a href="javascript:setCID(<%=cid%>)">보기</a></td>		<!-- 클릭하면 ajax로 값을 넘겨 화면을 부분적(div id=ajaxReturn)으로 갱신되게 함 -->
 			<td>
 				<form action="view.jsp" method="post">
 					<input name="content_id" value="<%=rs.getString("CONTENT_ID") %>" type="hidden">
@@ -172,7 +161,6 @@ function change_c(){
 			</td>
 		</tr>			
 <%	
-			i++;
 		}
 	}
 	catch(SQLException se) {
@@ -191,7 +179,6 @@ function change_c(){
 </table>
 </div>
 <br><br>
-
 <div class="member" id="ajaxReturn" style="height:50%" overflow="auto"></div> <!-- view_list.jsp에서 갱신된 화면을 표시할 div -->
 </div>
 </body>

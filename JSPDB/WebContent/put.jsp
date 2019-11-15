@@ -4,10 +4,10 @@
  -->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<% request.setCharacterEncoding("UTF-8"); %>
+<%@ page import = "java.util.*" %>
 <%@ page import = "java.sql.*" %>
-<%@ page import = "java.util.Date" %>
-<%@ page import = "java.text.SimpleDateFormat" %>
+<%@ page import = "java.text.*" %>
+<%@ page import = "java.io.*" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -19,19 +19,31 @@
 <div class="center">
 <span class="content">
 <%
-	String content_id = "", id = "", name = "", content_date = "";
+	request.setCharacterEncoding("UTF-8");
+	String content_id = "", id = "", name = "", content_date = "", ctimestart="", ctimeend="";
 	content_id = request.getParameter("content_id");
 	id = request.getParameter("txtID");
 	name = request.getParameter("txtNAME");
 	content_date = request.getParameter("content_date");
+	ctimestart =request.getParameter("ctimestart");
+	ctimeend =	request.getParameter("ctimeend");	
 	// 현재 날짜와 일정 날짜를 비교해 같지 않으면 에러 메시지 출력
-	Date now = new Date();
-	SimpleDateFormat nowDate = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+	java.util.Date now = new java.util.Date();
+	SimpleDateFormat nowDate = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+	SimpleDateFormat nowTime = new SimpleDateFormat("HH:mm");
+	Calendar cal = Calendar.getInstance();
+	cal.setTime(now);
+	cal.add(Calendar.HOUR, 2);
+	String time = nowTime.format(cal.getTime());
 	if(nowDate.format(now).indexOf(content_date) == -1) {
-		out.println("입력하신 정보를 다시 확인해주세요.");
+		out.println("QR코드를 다시 스캔해주세요.");
 		return;
 	}
-	
+	// 시작시간보다 빠르거나 종료시간보다 늦은 경우 에러 메시지 출력
+	if(time.compareTo(ctimestart) < 0 || time.compareTo(ctimeend) > 0) {
+		out.println("해당 일정의 시간이 아닙니다.");
+		return;
+	}
 	Connection con = null;
 	PreparedStatement stmt_insert = null;
 	PreparedStatement stmt_select_content = null;
@@ -90,7 +102,8 @@
 		out.println("" + name + " 님 " + content_date + "일 " + content_name + " 일정 출석 완료되었습니다.");		
 	}
 	catch(SQLException se) {
-		if(se.toString().contains("ID")) out.println(name + "님 이미 출석확인 되었습니다.");
+		// 자유 참가 형식에서 출석되어있는 사번으로 다시 출석할 때
+		if(se.toString().contains("ID")) out.println("이미 출석확인 되었습니다.");
 		else out.println(se.getMessage());
 	}
 	catch(Exception e) {

@@ -63,7 +63,7 @@ function validateForm() {
 <div class="center">
 <%
 	// param decoding code -> param 값으로 content_id와 content_date 추출--------
-	String cid = "", cdate = "";
+	String cid = "", cdate = "", ctimestart="", ctimeend="";
 	long key1 = 1759, key2 = 29, key3 = 19700101;
 	long param = Long.parseLong(request.getParameter("param"));
 	if(param % key2 != 0) {
@@ -98,6 +98,8 @@ function validateForm() {
 		if(rs_select_content.next()) {
 			content_name = rs_select_content.getString("CONTENT_NAME");
 			content_type = rs_select_content.getString("CONTENT_TYPE");
+			ctimestart = rs_select_content.getString("CONTENT_TIME_START");
+			ctimeend = rs_select_content.getString("CONTENT_TIME_END");
 		}
 		else {
 			out.println("QR코드를 다시 스캔해주세요.");
@@ -125,6 +127,8 @@ function validateForm() {
 	사번  <input type="text" class="attendData" name="txtID" maxlength="7" onkeypress="return fn_press(event, 'numbers');" onkeyup="fn_press_han(this);" style="ime-mode:Disabled"><br><br>
 	이름  <input type="text" class="attendData" name="txtNAME" onkeypress="specialKey()">
 	<input name="content_id" value="<%= cid %>" type="hidden">
+	<input name="ctimestart" value="<%= ctimestart %>" type="hidden">
+	<input name="ctimeend" value="<%= ctimeend %>" type="hidden">
 	<input name="content_date" value="<%= cdate %>" type="hidden"><br><br>
 	<input type="submit" value="출석" style="width:110px; height:70px;">
 </form>	
